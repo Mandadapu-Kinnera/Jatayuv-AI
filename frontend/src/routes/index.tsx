@@ -10,6 +10,7 @@ import { SectionTitle } from "@/components/site/decor";
 import { Button } from "@/components/site/button";
 import { Card } from "@/components/ui/card";
 import { FEATURES } from "@/lib/mock-data";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,6 +27,8 @@ const ICONS: Record<string, any> = {
 };
 
 function Landing() {
+  const { user } = useAuth();
+
   return (
     <div className="relative">
       <Navbar />
@@ -56,18 +59,31 @@ function Landing() {
               all generated in seconds.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="hero">
-                <Link to="/signup">
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="glass">
-                <Link to="/login">
-                  Login
-                </Link>
-              </Button>
-            </div>
+            {/* Auth CTA buttons in Hero - Disappear completely when user is logged in */}
+            {!user && (
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Button asChild size="lg" variant="hero">
+                  <Link to="/signup">
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="glass">
+                  <Link to="/login">
+                    Login
+                  </Link>
+                </Button>
+              </div>
+            )}
+
+            {user && (
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <Button asChild size="lg" variant="hero">
+                  <Link to="/destinations">
+                    Explore Destinations <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </motion.div>
 
           {/* Animated globe */}
@@ -125,32 +141,34 @@ function Landing() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-5xl px-4 pb-24 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-3xl glass-strong p-10 text-center sm:p-16"
-        >
-          <div className="absolute inset-0 -z-10 bg-gradient-hero opacity-20" />
-          <h2 className="font-display text-3xl font-bold sm:text-5xl">
-            Ready to <span className="text-gradient">explore the world?</span>
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Create your account and start planning in seconds.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg" variant="hero">
-              <Link to="/signup">Sign Up Free <ArrowRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
-            <Button asChild size="lg" variant="glass">
-              <Link to="/login">I already have an account</Link>
-            </Button>
-          </div>
-        </motion.div>
-      </section>
+      {/* Bottom Auth CTA Section - Disappears completely when user is logged in */}
+      {!user && (
+        <section className="mx-auto max-w-5xl px-4 pb-24 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative overflow-hidden rounded-3xl glass-strong p-10 text-center sm:p-16"
+          >
+            <div className="absolute inset-0 -z-10 bg-gradient-hero opacity-20" />
+            <h2 className="font-display text-3xl font-bold sm:text-5xl">
+              Ready to <span className="text-gradient">explore the world?</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+              Create your account and start planning in seconds.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild size="lg" variant="hero">
+                <Link to="/signup">Sign Up Free <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+              <Button asChild size="lg" variant="glass">
+                <Link to="/login">I already have an account</Link>
+              </Button>
+            </div>
+          </motion.div>
+        </section>
+      )}
 
       <Footer />
     </div>

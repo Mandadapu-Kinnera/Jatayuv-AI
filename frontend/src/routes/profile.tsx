@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { LogOut, Lock, User as UserIcon, Mail, Phone, Globe2, Save, Check } from "lucide-react";
+import { LogOut, Lock, User as UserIcon, Mail, Phone, Globe2, Save, Check, Image as ImageIcon } from "lucide-react";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { Card } from "@/components/ui/card";
@@ -27,8 +27,9 @@ function ProfilePage() {
   const { user, ready, signOut, updateProfile, changePassword } = useAuth();
   const nav = useNavigate();
 
-  const [form, setForm] = useState({ name: "", phone: "", country: "", travelStyle: "" });
+  const [form, setForm] = useState({ name: "", phone: "", avatar_url: "", country: "", travelStyle: "" });
   const [saved, setSaved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pw, setPw] = useState({ current: "", next: "", confirm: "" });
   const [pwMsg, setPwMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -38,6 +39,7 @@ function ProfilePage() {
       setForm({
         name: user.name,
         phone: user.phone ?? "",
+        avatar_url: user.avatar_url ?? "",
         country: user.country ?? "",
         travelStyle: user.travelStyle ?? "",
       });
@@ -62,8 +64,12 @@ function ProfilePage() {
           <Card className="glass-strong relative overflow-hidden p-6 sm:p-8">
             <div aria-hidden className="absolute -right-12 -top-12 h-64 w-64 rounded-full bg-gradient-hero opacity-25 blur-3xl" />
             <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 sm:flex sm:flex-wrap sm:gap-6">
-              <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-hero font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
-                {initials(user.name)}
+              <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-hero font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.name} className="h-full w-full object-cover" />
+                ) : (
+                  initials(user.name)
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="truncate font-display text-2xl font-bold sm:text-3xl">{user.name}</h1>
@@ -80,8 +86,8 @@ function ProfilePage() {
               <Button
                 variant="glass"
                 className="col-span-2 w-full sm:w-auto"
-                onClick={() => {
-                  signOut();
+                onClick={async () => {
+                  await signOut();
                   nav({ to: "/" });
                 }}
               >
@@ -98,11 +104,16 @@ function ProfilePage() {
           </h2>
           <form
             className="mt-5 grid gap-4 sm:grid-cols-2"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              updateProfile(form);
-              setSaved(true);
-              setTimeout(() => setSaved(false), 2500);
+              setErrorMsg(null);
+              const res = await updateProfile(form);
+              if (res.ok) {
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2500);
+              } else {
+                setErrorMsg(res.error ?? "Failed to update profile.");
+              }
             }}
           >
             <div>
@@ -135,6 +146,19 @@ function ProfilePage() {
               </div>
             </div>
             <div>
+              <Label htmlFor="avatar_url">Avatar Image URL</Label>
+              <div className="relative mt-1.5">
+                <ImageIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="avatar_url"
+                  className="bg-card/40 pl-9"
+                  placeholder="https://example.com/avatar.jpg"
+                  value={form.avatar_url}
+                  onChange={(e) => setForm({ ...form, avatar_url: e.target.value })}
+                />
+              </div>
+            </div>
+            <div>
               <Label htmlFor="country">Country</Label>
               <div className="relative mt-1.5">
                 <Globe2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -147,7 +171,7 @@ function ProfilePage() {
                 />
               </div>
             </div>
-            <div className="sm:col-span-2">
+            <div>
               <Label htmlFor="style">Preferred travel style</Label>
               <Input
                 id="style"
@@ -157,6 +181,7 @@ function ProfilePage() {
                 onChange={(e) => setForm({ ...form, travelStyle: e.target.value })}
               />
             </div>
+            {errorMsg && <p className="sm:col-span-2 text-sm text-destructive">{errorMsg}</p>}
             <div className="sm:col-span-2">
               <Button variant="hero" type="submit">
                 {saved ? <Check className="mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
@@ -173,13 +198,13 @@ function ProfilePage() {
           </h2>
           <form
             className="mt-5 grid gap-4 sm:grid-cols-3"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               if (pw.next !== pw.confirm) {
                 setPwMsg({ ok: false, text: "New passwords do not match." });
                 return;
               }
-              const res = changePassword(pw.current, pw.next);
+              const res = await changePassword(pw.current, pw.next);
               setPwMsg(res.ok ? { ok: true, text: "Password updated." } : { ok: false, text: res.error! });
               if (res.ok) setPw({ current: "", next: "", confirm: "" });
             }}

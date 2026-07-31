@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useState } from "react";
 import {
@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { DESTINATIONS } from "@/lib/mock-data";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/destination/$id")({
   head: ({ params }) => {
@@ -66,7 +67,10 @@ function DestinationDetail() {
   const [showGuide, setShowGuide] = useState(false);
   const [itin, setItin] = useState<any | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [favorited, setFavorited] = useState(false);
+
+  const { user, isWishlisted, toggleWishlist, saveHistory } = useAuth();
+  const nav = useNavigate();
+  const saved = d ? isWishlisted(d.id) : false;
 
   if (!d) {
     return (
@@ -123,11 +127,14 @@ function DestinationDetail() {
               </Button>
               <UIButton
                 variant="outline"
-                onClick={() => setFavorited((f) => !f)}
+                onClick={async () => {
+                  if (!user) return nav({ to: "/login" });
+                  await toggleWishlist(d.id, d);
+                }}
                 className="border-white/20 bg-white/5"
               >
-                <Heart className={`mr-2 h-4 w-4 ${favorited ? "fill-rose-400 text-rose-400" : ""}`} />
-                {favorited ? "Saved" : "Save"}
+                <Heart className={`mr-2 h-4 w-4 ${saved ? "fill-rose-400 text-rose-400" : ""}`} />
+                {saved ? "Saved" : "Save"}
               </UIButton>
             </div>
           </motion.div>
@@ -314,9 +321,25 @@ function DestinationDetail() {
             onGenerate={(form) => {
               setGenerating(true);
               setItin(null);
-              setTimeout(() => {
-                setItin(buildItinerary(d, form));
+              setTimeout(async () => {
+                const generated = buildItinerary(d, form);
+                setItin(generated);
                 setGenerating(false);
+
+                // Immediately save generated itinerary into `trip_history` table if user is logged in
+                if (user) {
+                  await saveHistory({
+                    destination_id: d.id,
+                    destination_name: `${d.name}, ${d.country}`,
+                    from_date: form.from,
+                    to_date: form.to,
+                    days: form.days,
+                    travelers: form.travelers,
+                    budget: form.budget,
+                    travel_style: form.style,
+                    itinerary: generated,
+                  });
+                }
               }, 1400);
             }}
             generating={generating}
@@ -469,7 +492,7 @@ function GuideModal({
   );
 }
 
-function ItineraryView({ itinerary, onReset }: { itinerary: any; onReset: () => void }) {
+export function ItineraryView({ itinerary, onReset }: { itinerary: any; onReset?: () => void }) {
   return (
     <div>
       <div className="flex items-start justify-between gap-4">
@@ -482,7 +505,7 @@ function ItineraryView({ itinerary, onReset }: { itinerary: any; onReset: () => 
             {itinerary.days} days · {itinerary.travelers} travelers · {itinerary.budget} · {itinerary.style}
           </p>
         </div>
-        <UIButton size="sm" variant="outline" onClick={onReset}>Edit</UIButton>
+        {onReset && <UIButton size="sm" variant="outline" onClick={onReset}>Edit</UIButton>}
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -493,7 +516,7 @@ function ItineraryView({ itinerary, onReset }: { itinerary: any; onReset: () => 
       </div>
 
       <div className="mt-6 space-y-4">
-        {itinerary.days_plan.map((day: any) => (
+        {itinerary.days_plan?.map((day: any) => (
           <Card key={day.day} className="glass p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -528,13 +551,13 @@ function ItineraryView({ itinerary, onReset }: { itinerary: any; onReset: () => 
         <Card className="glass p-4">
           <div className="text-xs uppercase tracking-wider text-accent">Packing Suggestions</div>
           <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-            {itinerary.packing.map((p: string) => <Badge key={p} variant="secondary" className="bg-white/10">{p}</Badge>)}
+            {itinerary.packing?.map((p: string) => <Badge key={p} variant="secondary" className="bg-white/10">{p}</Badge>)}
           </div>
         </Card>
         <Card className="glass p-4">
           <div className="text-xs uppercase tracking-wider text-accent">Hidden Gems</div>
           <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-            {itinerary.hiddenGems.map((g: string) => <li key={g}>✦ {g}</li>)}
+            {itinerary.hiddenGems?.map((g: string) => <li key={g}>✦ {g}</li>)}
           </ul>
         </Card>
       </div>
@@ -544,20 +567,20 @@ function ItineraryView({ itinerary, onReset }: { itinerary: any; onReset: () => 
 
 function buildItinerary(d: any, f: GuideForm) {
   const days = Math.min(Math.max(f.days || 5, 1), 14);
-  const attractions = d.topAttractions.length ? d.topAttractions : ["Local landmarks","City center","Heritage walk","Sunset viewpoint","Local market"];
-  const acts = d.thingsToDo.length ? d.thingsToDo : ["Cultural tour","Food tasting","Nature walk","Local experience"];
-  const foods = d.food.length ? d.food : ["Local cuisine","Street food","Cafés"];
+  const attractions = d.topAttractions?.length ? d.topAttractions : ["Local landmarks","City center","Heritage walk","Sunset viewpoint","Local market"];
+  const acts = d.thingsToDo?.length ? d.thingsToDo : ["Cultural tour","Food tasting","Nature walk","Local experience"];
+  const foods = d.food?.length ? d.food : ["Local cuisine","Street food","Cafés"];
   const stays = ["Boutique Hotel","Heritage Stay","City Resort","Lakeside Lodge","Riverfront Inn","Mountain Retreat","Beach Villa"];
-  const transports = d.transport.length ? d.transport : ["Taxi","Walk"];
+  const transports = d.transport?.length ? d.transport : ["Taxi","Walk"];
   const perDay = f.budget === "Luxury" ? 350 : f.budget === "Medium" ? 180 : 80;
 
   const days_plan = Array.from({ length: days }).map((_, i) => ({
     day: i + 1,
     title: i === 0 ? `Arrival in ${d.name}` : i === days - 1 ? "Last day & departure" : `Exploring ${attractions[i % attractions.length]}`,
-    morning: i === 0 ? `Arrive at ${d.airport}, transfer to hotel, freshen up` : `Visit ${attractions[i % attractions.length]} early to beat crowds`,
+    morning: i === 0 ? `Arrive at ${d.airport || "destination"}, transfer to hotel, freshen up` : `Visit ${attractions[i % attractions.length]} early to beat crowds`,
     afternoon: `${acts[i % acts.length]} · lunch with local ${foods[i % foods.length]}`,
     evening: `${attractions[(i + 2) % attractions.length]} & sunset views`,
-    night: i === days - 1 ? `Pack up, transfer to ${d.airport}` : `Dinner & relax at hotel`,
+    night: i === days - 1 ? `Pack up, transfer to airport` : `Dinner & relax at hotel`,
     hotel: stays[i % stays.length],
     restaurant: `Local favorite — ${foods[i % foods.length]}`,
     transport: transports[i % transports.length],
@@ -569,13 +592,13 @@ function buildItinerary(d: any, f: GuideForm) {
     destination: `${d.name}, ${d.country}`,
     days, travelers: f.travelers,
     budget: f.budget, style: f.style,
-    weather: `${d.climate}, pleasant`,
-    safety: Math.round(d.safety * 18 + 10),
+    weather: `${d.climate || "Pleasant"}, clear skies`,
+    safety: Math.round((d.safety || 4.5) * 18 + 10),
     totalCost: `$${perDay * days * f.travelers}`,
     packing: [
       "Comfortable shoes","Travel adapter","Sunscreen","Reusable bottle","Light jacket",
-      ...(d.type.includes("Snow") || d.type.includes("Mountain") ? ["Thermals","Gloves","Beanie"] : []),
-      ...(d.type.includes("Beach") || d.type.includes("Island") ? ["Swimwear","Hat","Beach towel"] : []),
+      ...((d.type || []).includes("Snow") || (d.type || []).includes("Mountain") ? ["Thermals","Gloves","Beanie"] : []),
+      ...((d.type || []).includes("Beach") || (d.type || []).includes("Island") ? ["Swimwear","Hat","Beach towel"] : []),
     ],
     hiddenGems: [
       `A quiet café locals love near ${attractions[0] ?? "the old town"}`,

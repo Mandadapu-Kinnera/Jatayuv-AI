@@ -55,9 +55,9 @@ function LoginPage() {
 
         <form
           className="mt-6 space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            const res = signIn({ email, password });
+            const res = await signIn({ email, password });
             if (!res.ok) return setError(res.error ?? "Could not sign in.");
             nav({ to: "/destinations" });
           }}

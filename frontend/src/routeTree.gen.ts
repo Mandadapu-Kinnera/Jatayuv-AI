@@ -14,12 +14,14 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DestinationsRouteImport } from './routes/destinations'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as NearbyRouteImport } from './routes/nearby'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as DestinationIdRouteImport } from './routes/destination.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -45,6 +47,11 @@ const DestinationsRoute = DestinationsRouteImport.update({
 const FeaturesRoute = FeaturesRouteImport.update({
   id: '/features',
   path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -77,6 +84,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DestinationIdRoute = DestinationIdRouteImport.update({
   id: '/destination/$id',
   path: '/destination/$id',
@@ -89,12 +101,14 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/destinations': typeof DestinationsRoute
   '/features': typeof FeaturesRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/nearby': typeof NearbyRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/wishlist': typeof WishlistRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesByTo {
@@ -103,12 +117,14 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/destinations': typeof DestinationsRoute
   '/features': typeof FeaturesRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/nearby': typeof NearbyRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/wishlist': typeof WishlistRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRoutesById {
@@ -118,12 +134,14 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/destinations': typeof DestinationsRoute
   '/features': typeof FeaturesRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/nearby': typeof NearbyRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/wishlist': typeof WishlistRoute
   '/destination/$id': typeof DestinationIdRoute
 }
 export interface FileRouteTypes {
@@ -134,12 +152,14 @@ export interface FileRouteTypes {
     | '/contact'
     | '/destinations'
     | '/features'
+    | '/history'
     | '/login'
     | '/nearby'
     | '/pricing'
     | '/profile'
     | '/signup'
     | '/sitemap.xml'
+    | '/wishlist'
     | '/destination/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -148,12 +168,14 @@ export interface FileRouteTypes {
     | '/contact'
     | '/destinations'
     | '/features'
+    | '/history'
     | '/login'
     | '/nearby'
     | '/pricing'
     | '/profile'
     | '/signup'
     | '/sitemap.xml'
+    | '/wishlist'
     | '/destination/$id'
   id:
     | '__root__'
@@ -162,12 +184,14 @@ export interface FileRouteTypes {
     | '/contact'
     | '/destinations'
     | '/features'
+    | '/history'
     | '/login'
     | '/nearby'
     | '/pricing'
     | '/profile'
     | '/signup'
     | '/sitemap.xml'
+    | '/wishlist'
     | '/destination/$id'
   fileRoutesById: FileRoutesById
 }
@@ -177,12 +201,14 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DestinationsRoute: typeof DestinationsRoute
   FeaturesRoute: typeof FeaturesRoute
+  HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   NearbyRoute: typeof NearbyRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  WishlistRoute: typeof WishlistRoute
   DestinationIdRoute: typeof DestinationIdRoute
 }
 
@@ -221,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/features'
       fullPath: '/features'
       preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -265,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destination/$id': {
       id: '/destination/$id'
       path: '/destination/$id'
@@ -281,12 +321,14 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DestinationsRoute: DestinationsRoute,
   FeaturesRoute: FeaturesRoute,
+  HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   NearbyRoute: NearbyRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  WishlistRoute: WishlistRoute,
   DestinationIdRoute: DestinationIdRoute,
 }
 export const routeTree = rootRouteImport

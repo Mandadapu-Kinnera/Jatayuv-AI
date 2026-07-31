@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { Search, MapPin, Star, Sparkles, Filter, X } from "lucide-react";
+import { Search, MapPin, Star, Sparkles, Filter, X, Heart } from "lucide-react";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
 import { SectionTitle } from "@/components/site/decor";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, DESTINATIONS, type Destination } from "@/lib/mock-data";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/destinations")({
   head: () => ({
@@ -21,13 +22,17 @@ export const Route = createFileRoute("/destinations")({
 });
 
 function Card({ d }: { d: Destination }) {
+  const { user, isWishlisted, toggleWishlist } = useAuth();
+  const nav = useNavigate();
+  const saved = isWishlisted(d.id);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5 }}
-      className="group"
+      className="group relative"
     >
       <Link
         to="/destination/$id"
@@ -42,9 +47,26 @@ function Card({ d }: { d: Destination }) {
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium backdrop-blur">
+          
+          <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium backdrop-blur">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" /> {d.rating}
           </div>
+
+          <button
+            type="button"
+            onClick={async (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!user) return nav({ to: "/login" });
+              await toggleWishlist(d.id, d);
+            }}
+            className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition hover:scale-110 hover:bg-black/70"
+            title={saved ? "Remove from wishlist" : "Save to wishlist"}
+            aria-label="Wishlist"
+          >
+            <Heart className={`h-4 w-4 ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+          </button>
+
           <div className="absolute inset-x-4 bottom-4 text-white">
             <div className="flex items-center gap-1 text-xs uppercase tracking-wider opacity-80">
               <MapPin className="h-3 w-3" /> {d.country}

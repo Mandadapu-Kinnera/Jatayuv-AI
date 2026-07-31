@@ -57,10 +57,10 @@ function SignupPage() {
 
         <form
           className="mt-6 space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             if (pwd !== confirm) return setError("Passwords do not match.");
-            const res = signUp({ name, email, password: pwd });
+            const res = await signUp({ name, email, password: pwd });
             if (!res.ok) return setError(res.error ?? "Could not create account.");
             nav({ to: "/destinations" });
           }}
