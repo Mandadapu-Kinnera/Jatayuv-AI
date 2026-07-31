@@ -78,7 +78,8 @@ const TOKEN_KEY = "jatayuv_access_token";
 const REFRESH_TOKEN_KEY = "jatayuv_refresh_token";
 const USER_KEY = "jatayuv.user";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
 
 const AuthContext = createContext<AuthState | null>(null);
 
