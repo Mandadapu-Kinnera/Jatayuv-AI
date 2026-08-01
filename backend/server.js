@@ -32,6 +32,14 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Test endpoint
+app.get("/api/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "Backend working"
+  });
+});
+
 // 404 Handler for undefined API routes
 app.use((req, res) => {
   res.status(404).json({
