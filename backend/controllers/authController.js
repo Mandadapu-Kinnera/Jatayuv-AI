@@ -90,6 +90,7 @@ export const signup = async (req, res) => {
  * Authenticate user via Supabase Auth and fetch profile.
  */
 export const login = async (req, res) => {
+  console.log("LOGIN CONTROLLER EXECUTED");
   try {
     const { email, password } = req.body;
 

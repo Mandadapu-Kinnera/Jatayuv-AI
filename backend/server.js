@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 // DEBUG: Middleware to confirm /api/auth is reached
 app.use("/api/auth", (req, res, next) => {
-  console.log("AUTH ROUTE HIT", req.method, req.originalUrl);
+  console.log("AUTH REQUEST:", req.method, req.originalUrl);
   next();
 });
 

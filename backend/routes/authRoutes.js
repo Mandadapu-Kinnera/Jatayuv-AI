@@ -6,7 +6,7 @@ const router = Router();
 
 // DEBUG: Log when a request enters authRoutes
 router.use((req, res, next) => {
-  console.log("INSIDE authRoutes", req.method, req.originalUrl);
+  console.log("INSIDE AUTH ROUTER:", req.method, req.originalUrl);
   next();
 });
 
