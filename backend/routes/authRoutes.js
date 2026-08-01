@@ -4,6 +4,12 @@ import { requireAuth } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
+// DEBUG: Log when a request enters authRoutes
+router.use((req, res, next) => {
+  console.log("INSIDE authRoutes", req.method, req.originalUrl);
+  next();
+});
+
 // Public routes
 router.post("/signup", signup);
 router.post("/login", login);

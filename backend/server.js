@@ -8,6 +8,11 @@ import historyRoutes from "./routes/historyRoutes.js";
 
 dotenv.config();
 
+// DEBUG: Verify authRoutes imported correctly
+console.log("authRoutes imported:", authRoutes);
+console.log("authRoutes type:", typeof authRoutes);
+console.log("authRoutes.stack:", authRoutes?.stack?.map(r => `${r.route?.methods ? Object.keys(r.route.methods).join(',').toUpperCase() : 'MIDDLEWARE'} ${r.route?.path || r.regexp}`));
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -16,6 +21,18 @@ app.use(cors());
 
 // Parse incoming JSON requests
 app.use(express.json());
+
+// DEBUG: Log every incoming request
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// DEBUG: Middleware to confirm /api/auth is reached
+app.use("/api/auth", (req, res, next) => {
+  console.log("AUTH ROUTE HIT", req.method, req.originalUrl);
+  next();
+});
 
 // Base API Routes
 app.use("/api/auth", authRoutes);
@@ -57,9 +74,38 @@ app.use((err, req, res, next) => {
   });
 });
 
+// DEBUG: Print all registered routes
+function printRoutes(stack, prefix = '') {
+  stack.forEach((layer) => {
+    if (layer.route) {
+      const methods = Object.keys(layer.route.methods).map(m => m.toUpperCase()).join(',');
+      console.log(`  ${methods} ${prefix}${layer.route.path}`);
+    } else if (layer.name === 'router' && layer.handle?.stack) {
+      const routerPath = layer.regexp?.source === '^\\/?$' ? '' :
+        layer.keys?.length ? prefix : 
+        (layer.regexp?.toString().match(/\^\\\/(\w[\w/]*)/)?.[1] || '').replace(/\\\//, '/');
+      const mountPath = prefix + (routerPath ? '/' + routerPath : '');
+      printRoutes(layer.handle.stack, mountPath);
+    }
+  });
+}
+
+console.log('\n=== REGISTERED ROUTES ===');
+if (app._router) {
+  printRoutes(app._router.stack);
+} else {
+  console.log('  (no router initialized yet)');
+}
+console.log('=========================\n');
+
 // Start Express Server
 app.listen(PORT, () => {
   console.log(`🚀 Jatayuv AI Backend Server running on http://localhost:${PORT}`);
+  
+  // Also print routes after listen
+  console.log('\n=== ROUTES (after listen) ===');
+  printRoutes(app._router.stack);
+  console.log('=============================\n');
 });
 
 export default app;
