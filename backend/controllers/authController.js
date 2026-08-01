@@ -103,13 +103,24 @@ export const login = async (req, res) => {
       });
     }
 
+    // DEBUG: Log login request
+    console.log("LOGIN REQUEST", {
+      email: userEmail
+    });
+
     // Authenticate through Supabase Auth only
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: userEmail,
       password: userPassword,
     });
 
+    // DEBUG: Log Supabase response
+    console.log("SUPABASE LOGIN RESULT");
+    console.log("authData =", JSON.stringify(authData, null, 2));
+    console.log("authError =", authError ? JSON.stringify(authError, null, 2) : null);
+
     if (authError) {
+      console.log("LOGIN FAILED - full authError:", authError);
       return res.status(401).json({
         success: false,
         error: authError.message || "Invalid credentials.",
