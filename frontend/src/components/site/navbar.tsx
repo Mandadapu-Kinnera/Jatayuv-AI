@@ -54,7 +54,7 @@ export function Navbar() {
             <Sparkles className="absolute -right-1 -top-1 h-3.5 w-3.5 text-accent animate-twinkle" />
           </div>
           <span className="font-display text-base font-bold tracking-tight sm:text-lg">
-            Jatayuv <span className="text-gradient">AI</span>
+            Way2 <span className="text-gradient">Trip</span>
           </span>
         </Link>
 
