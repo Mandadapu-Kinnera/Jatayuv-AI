@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jatayuv AI — Plan Your Perfect Journey with AI" },
+      { title: "Way2Trip — Plan Your Perfect Journey with AI" },
       { name: "description", content: "Premium AI travel planner. Personalized itineraries, hidden gems, and smart budgets for 190+ countries." },
     ],
   }),
