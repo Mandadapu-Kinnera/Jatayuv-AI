@@ -14,8 +14,8 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/wishlist")({
   head: () => ({
     meta: [
-      { title: "Your Wishlist — Jatayuv AI" },
-      { name: "description", content: "Your saved travel destinations on Jatayuv AI." },
+      { title: "Your Wishlist — Way2Trip AI" },
+      { name: "description", content: "Your saved travel destinations on Way2Trip AI." },
     ],
   }),
   component: WishlistPage,
