@@ -21,7 +21,7 @@ const ICONS: Record<string, any> = {
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — Jatayuv AI" },
+      { title: "Features — Way2Trip AI" },
       { name: "description", content: "20+ AI-powered capabilities to plan, navigate, and live the perfect trip." },
     ],
   }),
