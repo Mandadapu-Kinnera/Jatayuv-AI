@@ -14,8 +14,8 @@ import { ItineraryView } from "./destination.$id";
 export const Route = createFileRoute("/history")({
   head: () => ({
     meta: [
-      { title: "Trip History — Jatayuv AI" },
-      { name: "description", content: "Your generated AI travel itineraries on Jatayuv AI." },
+      { title: "Trip History — Way2Trip AI" },
+      { name: "description", content: "Your generated AI travel itineraries on Way2Trip AI." },
     ],
   }),
   component: HistoryPage,
