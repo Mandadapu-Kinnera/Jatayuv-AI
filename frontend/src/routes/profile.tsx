@@ -14,10 +14,10 @@ import { useAuth, initials } from "@/lib/auth";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your Profile — Jatayuv AI" },
-      { name: "description", content: "Manage your Jatayuv AI account details, password and preferences." },
-      { property: "og:title", content: "Your Profile — Jatayuv AI" },
-      { property: "og:description", content: "Manage your Jatayuv AI account details, password and preferences." },
+      { title: "Your Profile — Way2Trip AI" },
+      { name: "description", content: "Manage your Way2Trip AI account details, password and preferences." },
+      { property: "og:title", content: "Your Profile — Way2Trip AI" },
+      { property: "og:description", content: "Manage your Way2Trip AI account details, password and preferences." },
     ],
   }),
   component: ProfilePage,
