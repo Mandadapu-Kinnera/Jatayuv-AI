@@ -44,7 +44,7 @@ export function Footer() {
                 <Plane className="h-5 w-5 text-white" />
               </div>
               <span className="font-display text-lg font-bold">
-                Jatayuv <span className="text-gradient">AI</span>
+                Way2 <span className="text-gradient">Trip</span>
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
@@ -85,7 +85,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Jatayuv AI. Crafted for explorers.
+            © {new Date().getFullYear()} Way2Trip. Crafted for explorers.
           </p>
           <div className="flex gap-2">
             {[Twitter, Instagram, Youtube, Linkedin, Github].map((Icon, i) => (
